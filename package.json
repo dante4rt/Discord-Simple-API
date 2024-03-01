@@ -1,6 +1,6 @@
 {
   "name": "discord-simple-api",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Discord API v10 wrapper for managing messages, channels, roles, and user interactions.",
   "main": "index.js",
   "scripts": {
