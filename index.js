@@ -1,40 +1,48 @@
 const axios = require('axios');
+const winston = require('winston');
+
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'combined.log' }),
+  ],
+});
 
 class Discord {
   constructor(token) {
     if (!token) {
+      logger.error('No Discord token provided');
       throw new Error('Please provide a Discord token');
     }
 
     this.baseURL = 'https://discord.com/api/v10';
-    this.headers = { headers: { authorization: token } };
+    this.headers = { headers: { Authorization: `Bot ${token}` } };
   }
 
-  // Get user information
   async getUserInformation() {
     try {
-      const url = this.baseURL + '/users/@me';
+      const url = `${this.baseURL}/users/@me`;
       const response = await axios.get(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error fetching user information: ' + error.message);
       throw error;
     }
   }
 
-  // Get messages in a channel
   async getMessagesInChannel(channelId, limit) {
     try {
       const url = `${this.baseURL}/channels/${channelId}/messages?limit=${limit}`;
       const response = await axios.get(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error fetching messages in channel: ' + error.message);
       throw error;
     }
   }
 
-  // Send a message to a channel
   async sendMessageToChannel(channelId, message) {
     try {
       const data = { content: message };
@@ -42,24 +50,22 @@ class Discord {
       const response = await axios.post(url, data, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error sending message to channel: ' + error.message);
       throw error;
     }
   }
 
-  // Delete a message in a channel
   async deleteMessageInChannel(channelId, messageId) {
     try {
       const url = `${this.baseURL}/channels/${channelId}/messages/${messageId}`;
       const response = await axios.delete(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error deleting message in channel: ' + error.message);
       throw error;
     }
   }
 
-  // Join a guild by invite code
   async joinGuildByInvite(inviteCode) {
     try {
       const data = {};
@@ -67,96 +73,88 @@ class Discord {
       const response = await axios.post(url, data, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error joining guild by invite: ' + error.message);
       throw error;
     }
   }
 
-  // Leave a guild
   async leaveGuild(guildId) {
     try {
       const url = `${this.baseURL}/users/@me/guilds/${guildId}`;
       const response = await axios.delete(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error leaving guild: ' + error.message);
       throw error;
     }
   }
 
-  // Retrieve a list of roles in a guild
   async getGuildRoles(guildId) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/roles`;
       const response = await axios.get(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error retrieving guild roles: ' + error.message);
       throw error;
     }
   }
 
-  // Add a role to a guild member
   async addRoleToMember(guildId, memberId, roleId) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/members/${memberId}/roles/${roleId}`;
       const response = await axios.put(url, {}, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error adding role to member: ' + error.message);
       throw error;
     }
   }
 
-  // Remove a role from a guild member
   async removeRoleFromMember(guildId, memberId, roleId) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/members/${memberId}/roles/${roleId}`;
       const response = await axios.delete(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error removing role from member: ' + error.message);
       throw error;
     }
   }
 
-  // Create a new role in a guild
   async createGuildRole(guildId, roleData) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/roles`;
       const response = await axios.post(url, roleData, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error creating guild role: ' + error.message);
       throw error;
     }
   }
 
-  // Update a guild role
   async updateGuildRole(guildId, roleId, roleData) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/roles/${roleId}`;
       const response = await axios.patch(url, roleData, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error updating guild role: ' + error.message);
       throw error;
     }
   }
 
-  // Delete a guild role
   async deleteGuildRole(guildId, roleId) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/roles/${roleId}`;
       const response = await axios.delete(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error deleting guild role: ' + error.message);
       throw error;
     }
   }
 
-  // Mute a member in a voice channel
   async muteMemberInVoiceChannel(guildId, memberId, mute = true) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/members/${memberId}`;
@@ -164,48 +162,44 @@ class Discord {
       const response = await axios.patch(url, data, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error muting member in voice channel: ' + error.message);
       throw error;
     }
   }
 
-  // Create a channel
   async createChannel(guildId, channelData) {
     try {
       const url = `${this.baseURL}/guilds/${guildId}/channels`;
       const response = await axios.post(url, channelData, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error creating channel: ' + error.message);
       throw error;
     }
   }
 
-  // Update a channel
   async updateChannel(channelId, channelData) {
     try {
       const url = `${this.baseURL}/channels/${channelId}`;
       const response = await axios.patch(url, channelData, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error updating channel: ' + error.message);
       throw error;
     }
   }
 
-  // Delete a channel
   async deleteChannel(channelId) {
     try {
       const url = `${this.baseURL}/channels/${channelId}`;
       const response = await axios.delete(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error deleting channel: ' + error.message);
       throw error;
     }
   }
 
-  // Add a reaction to a message
   async addReaction(channelId, messageId, emoji) {
     try {
       const url = `${
@@ -216,12 +210,11 @@ class Discord {
       const response = await axios.put(url, {}, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error adding reaction to message: ' + error.message);
       throw error;
     }
   }
 
-  // Remove a reaction from a message
   async removeReaction(channelId, messageId, emoji) {
     try {
       const url = `${
@@ -232,132 +225,7 @@ class Discord {
       const response = await axios.delete(url, this.headers);
       return response.data;
     } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Create a webhook
-  async createWebhook(channelId, webhookData) {
-    try {
-      const url = `${this.baseURL}/channels/${channelId}/webhooks`;
-      const response = await axios.post(url, webhookData, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Update a webhook
-  async updateWebhook(webhookId, webhookData) {
-    try {
-      const url = `${this.baseURL}/webhooks/${webhookId}`;
-      const response = await axios.patch(url, webhookData, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Delete a webhook
-  async deleteWebhook(webhookId) {
-    try {
-      const url = `${this.baseURL}/webhooks/${webhookId}`;
-      const response = await axios.delete(url, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // List guild emojis
-  async listGuildEmojis(guildId) {
-    try {
-      const url = `${this.baseURL}/guilds/${guildId}/emojis`;
-      const response = await axios.get(url, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Create a guild emoji
-  async createGuildEmoji(guildId, emojiData) {
-    try {
-      const url = `${this.baseURL}/guilds/${guildId}/emojis`;
-      const response = await axios.post(url, emojiData, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Update a guild emoji
-  async updateGuildEmoji(guildId, emojiId, emojiData) {
-    try {
-      const url = `${this.baseURL}/guilds/${guildId}/emojis/${emojiId}`;
-      const response = await axios.patch(url, emojiData, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Delete a guild emoji
-  async deleteGuildEmoji(guildId, emojiId) {
-    try {
-      const url = `${this.baseURL}/guilds/${guildId}/emojis/${emojiId}`;
-      const response = await axios.delete(url, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Set bot user's presence
-  async setBotPresence(presenceData) {
-    try {
-      const url = `${this.baseURL}/users/@me/settings`;
-      const response = await axios.patch(url, presenceData, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Send a direct message
-  async sendDirectMessage(userId, messageData) {
-    try {
-      const url = `${this.baseURL}/users/@me/channels`;
-      const channelResponse = await axios.post(
-        url,
-        { recipient_id: userId },
-        this.headers
-      );
-      const channelId = channelResponse.data.id;
-      return this.sendMessageToChannel(channelId, messageData.content);
-    } catch (error) {
-      console.error('Error fetching user information:', error);
-      throw error;
-    }
-  }
-
-  // Retrieve audit logs
-  async getAuditLogs(guildId) {
-    try {
-      const url = `${this.baseURL}/guilds/${guildId}/audit-logs`;
-      const response = await axios.get(url, this.headers);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching user information:', error);
+      logger.error('Error removing reaction from message: ' + error.message);
       throw error;
     }
   }

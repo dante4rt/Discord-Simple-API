@@ -1,6 +1,6 @@
 {
   "name": "discord-simple-api",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Discord API v10 wrapper for managing messages, channels, roles, and user interactions.",
   "main": "index.js",
   "scripts": {
@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/dante4rt/Discord-Simple-API#readme",
   "dependencies": {
-    "axios": "^1.6.5"
+    "axios": "^1.6.5",
+    "winston": "^3.11.0"
   }
 }
