@@ -18,7 +18,7 @@ class Discord {
     }
 
     this.baseURL = 'https://discord.com/api/v10';
-    this.headers = { headers: { Authorization: `Bot ${token}` } };
+    this.headers = { headers: { Authorization: `${token}` } };
   }
 
   async getUserInformation() {
